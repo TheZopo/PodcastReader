@@ -11,6 +11,7 @@ body {
     color: #55d4c2;
 
     font-family: "Ubuntu", sans-serif;
+    overflow-x: hidden;
 }
 
 /* HEADER */
@@ -26,12 +27,17 @@ h1 {
     font-weight: 700;
 }
 
-/* CONTENT */
+.screen {
+    position: absolute;
+    width: 100vw;
+}
 
 .container {
     width: 75%;
     margin: 0 auto;
 }
+
+/* STREAM LIST */
 
 .addStream {
     width: 75%;
@@ -92,18 +98,23 @@ h1 {
 
 .streams {
     width: 90%;
-    margin: 0 auto;
+    margin: 0 auto 10rem auto;
 }
 
 .stream {
+    opacity: 0;
     padding: 2rem 0;
 
-    border-top-width: 2px;
+    border-top-width: 0;
     border-bottom-width: 2px;
     border-style: solid;
     border-image: linear-gradient(to left, #4b4b4b, #373737, #4b4b4b) 100% 1;
 
     transition: background-color .2s ease;
+}
+
+.stream:nth-child(1) {
+    border-top-width: 2px;
 }
 
 .stream:hover {
@@ -130,6 +141,12 @@ h1 {
 
 .stream p {
     color: white;
+}
+
+/* PODCAST LIST */
+
+.screen#podcasts {
+    left: 100vw;
 }
 
 video {
