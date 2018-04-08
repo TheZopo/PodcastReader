@@ -106,6 +106,7 @@ function selectStream(stream) {
 function buildDOMPodcast(podcast) {
     var dom_podcast = document.createElement("div");
     dom_podcast.classList.add("podcast");
+    if(podcastAlreadyInPlaylist(podcast)) dom_podcast.classList.add("selected");
     dom_podcast.setAttribute("podcastid", podcast.id);
     dom_podcast.onclick = function() { onClickOnPodcastList(podcast, dom_podcast) };
 
