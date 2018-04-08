@@ -297,4 +297,7 @@ function podcastsToStreams() {
         document.querySelector(".screen#podcasts").style.left = "100vw";
         document.querySelector(".screen#streams").style.left = "0";
     }, 250);
+
+    var podcasts = document.getElementsByClassName("podcasts")[0];
+    while(podcasts.firstChild) podcasts.removeChild(podcasts.firstChild);
 }
