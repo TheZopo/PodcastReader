@@ -6,6 +6,10 @@
 
     <link rel="stylesheet" type="text/css" href="podcastReader.css" />
     <script type="text/javascript" src="podcastReader.js"></script>
+
+    <!-- Icon library that uses JQuery-->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//cdn.rawgit.com/icons8/bower-webicon/v0.10.7/jquery-webicon.min.js"></script>
 </head>
 <body>
     <header>
@@ -18,15 +22,24 @@
                 <input type="text" placeholder="rss stream..." id="streamURL"/>
                 <button onclick="loadStream()">Add stream</button>
             </div>
-            <div class="streams">
-
-            </div>
+            <div class="streams"></div>
         </div>
     </div>
 
     <div class="screen" id="podcasts">
+        <webicon icon="entypo:chevron-thin-left" class="return" onclick="podcastsToStreams()"></webicon>
         <div class="container">
-            <!--TODO: Show podcasts -->
+            <img id="streamCover" src="" />
+            <h1 id="streamTitle"></h1>
+            <div class="podcasts"></div>
+        </div>
+    </div>
+
+    <div class="playlist">
+        <div class="container">
+            <input type="text" id="playlistTitle" value="My super playlist">
+            <i id="addItemHint">Click on a item of your rss stream to add it in your playlist</i>
+            <div class="items"></div>
         </div>
     </div>
 </body>
