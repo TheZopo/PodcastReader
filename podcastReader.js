@@ -204,18 +204,47 @@ function removePodcastFromList(podcast) {
 
     playlist.splice(playlist.indexOf(podcast), 1);
 
-    document.getElementById("addItemHint").style.display = playlist.length === 0 ? "inline" : "none";
-
-    if(playlist.length > 0) playlistItems.lastChild.children[0].children[1].style.display = "none";
-    if(playlist.length > 0) playlistItems.firstChild.children[0].children[0].style.display = "none";
+    updatePodcastControls();
 }
 
 function podcastUp(podcast) {
-    //TODO: Podcast up
+    var index = playlist.indexOf(podcast);
+
+    playlist[index] = playlist[index - 1];
+    playlist[index - 1] = podcast;
+
+    var playlist_dom = document.querySelector(".playlist .items");
+    playlist_dom.insertBefore(playlist_dom.children[index], playlist_dom.children[index - 1]);
+    playlist_dom.children[index - 1].children[0].children[0].style.display = "inline-block";
+    playlist_dom.children[index - 1].children[0].children[1].style.display = "inline-block";
+    playlist_dom.children[index].children[0].children[0].style.display = "inline-block";
+    playlist_dom.children[index].children[0].children[1].style.display = "inline-block";
+
+    updatePodcastControls();
 }
 
-function podcastDown() {
-    //TODO: podcast down
+function podcastDown(podcast) {
+    var index = playlist.indexOf(podcast);
+
+    playlist[index] = playlist[index + 1];
+    playlist[index + 1] = podcast;
+
+    var playlist_dom = document.querySelector(".playlist .items");
+    playlist_dom.insertBefore(playlist_dom.children[index + 1], playlist_dom.children[index]);
+    playlist_dom.children[index].children[0].children[0].style.display = "inline-block";
+    playlist_dom.children[index].children[0].children[1].style.display = "inline-block";
+    playlist_dom.children[index + 1].children[0].children[0].style.display = "inline-block";
+    playlist_dom.children[index + 1].children[0].children[1].style.display = "inline-block";
+
+    updatePodcastControls();
+}
+
+function updatePodcastControls() {
+    document.getElementById("addItemHint").style.display = playlist.length === 0 ? "inline" : "none";
+
+    var playlistItems = document.getElementsByClassName("items")[0];
+    playlistItems.firstChild.children[0].children[0].style.display = "none";
+    playlistItems.lastChild.children[0].children[1].style.display = "none";
 }
 
 //  UTILS
