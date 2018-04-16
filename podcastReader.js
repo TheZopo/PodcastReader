@@ -2,6 +2,12 @@ var streams = [];
 var playlist = [];
 var play = false;
 
+window.onload = function() {
+    var video = document.getElementById("media_video");
+    video.addEventListener("timeupdate", function() { updateTimer() });
+    video.addEventListener("ended", function() { playNext() });
+};
+
 function loadStream() {
     if(streamAlreadyExists()) {
         //TODO: ERROR STREAM ALREADY EXIST
@@ -123,24 +129,6 @@ function buildDOMPodcast(podcast) {
     return dom_podcast;
 }
 
-function buildReader() {
-    var video = document.getElementById("media_video");
-    while(video.firstChild) video.removeChild(video.firstChild);
-
-    playlist.forEach(function(podcast) {
-        var source = document.createElement("source");
-        source.setAttribute("src", podcast.url);
-        source.setAttribute("type", podcast.type);
-
-        video.appendChild(source);
-    });
-
-    if(playlist[0].type.includes("audio")) {
-        document.getElementById("media_img").setAttribute("src", getPodcastStream(playlist[0]).image);
-        document.getElementById("media_video").style.display = "none";
-    }
-}
-
 function onClickOnPodcastList(podcast, dom_podcast) {
     var items = document.getElementById("playlist_items");
 
@@ -232,7 +220,7 @@ function podcastDown(podcast) {
     playlist[index] = playlist[index + 1];
     playlist[index + 1] = podcast;
 
-    var playlist_dom = document.querySelector(".playlist .items");
+    var playlist_dom = document.getElementById("playlist_items")
     playlist_dom.insertBefore(playlist_dom.children[index + 1], playlist_dom.children[index]);
     playlist_dom.children[index].children[0].children[0].style.display = "inline-block";
     playlist_dom.children[index].children[0].children[1].style.display = "inline-block";
@@ -250,11 +238,77 @@ function updatePodcastControls() {
     playlistItems.lastChild.children[0].children[1].style.display = "none";
 }
 
-// CONTROLS
+// PLAYER
+
+function buildReader() {
+    var video = document.getElementById("media_video");
+    if(video.firstChild) video.removeChild(video.firstChild);
+
+    var source = document.createElement("source");
+    source.setAttribute("src", playlist[0].url);
+    source.setAttribute("type", playlist[0].type);
+
+    video.appendChild(source);
+
+    if(playlist[0].type.includes("audio")) {
+        document.getElementById("media_img").style.display = "inline";
+        document.getElementById("media_img").setAttribute("src", getPodcastStream(playlist[0]).image);
+        document.getElementById("media_video").style.display = "none";
+    } else {
+        document.getElementById("media_img").style.display = "none";
+        document.getElementById("media_video").style.display = "inherit";
+    }
+
+    buildReaderPlaylist()
+}
+
+function buildReaderPlaylist() {
+    var player_list = document.getElementById("player_list");
+    while(player_list.firstChild) player_list.removeChild(player_list.firstChild);
+
+    playlist.forEach(function(podcast) {
+        var dom_podcast = buildDOMPodcast(podcast);
+        dom_podcast.classList.remove("selected");
+        dom_podcast.onclick = undefined;
+
+        player_list.appendChild(dom_podcast);
+    });
+}
+
+function updateTimer() {
+    var video = document.getElementById("media_video");
+    document.getElementById("progress-bar").value = video.currentTime / video.duration;
+}
+
+function playNext() {
+    var video = document.getElementById("media_video");
+
+    if(playlist.length > 1) {
+        for(var i = 0; i < playlist.length - 1; i++) {
+            playlist[i] = playlist[i + 1];
+        }
+
+        playlist[playlist.length - 1] = undefined;
+        playlist.splice(playlist.indexOf(undefined));
+    } else {
+        playlist = [];
+        video.pause();
+        video.currentTime = 0;
+
+        var player_list = document.getElementById("player_list");
+        while(player_list.firstChild) player_list.removeChild(player_list.firstChild);
+
+        return;
+    }
+
+    video.currentTime = 0;
+    buildReader();
+    video.load();
+    video.play();
+}
 
 function controlsPlay() {
     var video = document.getElementById("media_video");
-    video.addEventListener("timeupdate", function() { updateTimer() });
 
     var playButton = document.createElement("webicon");
     playButton.onclick = function() { controlsPlay() };
@@ -277,11 +331,6 @@ function controlsPlay() {
 
         play = true;
     }
-}
-
-function updateTimer() {
-    var video = document.getElementById("media_video");
-    document.getElementById("progress-bar").value = video.currentTime / video.duration;
 }
 
 function clickProgressBar(event) {
@@ -382,7 +431,6 @@ function podcastsToStreams() {
 
 function appendPlaylist() {
     var element = document.getElementById("playlist");
-
 
     var height = 0;
     var incr = 1.5;
