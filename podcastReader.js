@@ -4,8 +4,8 @@ var play = false;
 
 window.onload = function() {
     var video = document.getElementById("media_video");
-    video.addEventListener("timeupdate", function() { updateTimer() });
-    video.addEventListener("ended", function() { playNext() });
+    video.addEventListener("timeupdate", function() { updateTimer(); });
+    video.addEventListener("ended", function() { playNext(); });
 };
 
 function loadStream() {
@@ -73,7 +73,7 @@ function addStream(stream) {
 function buildDOMStream(stream) {
     var dom_stream = document.createElement("div");
     dom_stream.classList.add("stream");
-    dom_stream.onclick = function() { selectStream(stream) };
+    dom_stream.onclick = function() { selectStream(stream); };
 
     var img = document.createElement("img");
     img.setAttribute("src", stream.image);
@@ -115,7 +115,7 @@ function buildDOMPodcast(podcast) {
     dom_podcast.classList.add("podcast");
     if(podcastAlreadyInPlaylist(podcast)) dom_podcast.classList.add("selected");
     dom_podcast.setAttribute("podcastid", podcast.id);
-    dom_podcast.onclick = function() { onClickOnPodcastList(podcast, dom_podcast) };
+    dom_podcast.onclick = function() { onClickOnPodcastList(podcast, dom_podcast); };
 
     var h1 = document.createElement("h1");
     h1.textContent = podcast.title + " (" + podcast.date + ")";
@@ -145,17 +145,17 @@ function onClickOnPodcastList(podcast, dom_podcast) {
 
         var upArrow = document.createElement("webicon");
         upArrow.setAttribute("icon", "entypo:chevron-with-circle-up");
-        upArrow.onclick = function () { podcastUp(podcast) };
+        upArrow.onclick = function () { podcastUp(podcast); };
         if(playlist.length === 0) upArrow.style.display = "none";
 
         var downArrow = document.createElement("webicon");
         downArrow.setAttribute("icon", "entypo:chevron-with-circle-down");
         downArrow.style.display = "none";
-        downArrow.onclick = function () { podcastDown(podcast) };
+        downArrow.onclick = function () { podcastDown(podcast); };
 
         var remove = document.createElement("webicon");
         remove.setAttribute("icon", "maki:cross");
-        remove.onclick = function() { removePodcastFromList(podcast) };
+        remove.onclick = function() { removePodcastFromList(podcast); };
 
         controls.appendChild(upArrow);
         controls.appendChild(downArrow);
@@ -220,7 +220,7 @@ function podcastDown(podcast) {
     playlist[index] = playlist[index + 1];
     playlist[index + 1] = podcast;
 
-    var playlist_dom = document.getElementById("playlist_items")
+    var playlist_dom = document.getElementById("playlist_items");
     playlist_dom.insertBefore(playlist_dom.children[index + 1], playlist_dom.children[index]);
     playlist_dom.children[index].children[0].children[0].style.display = "inline-block";
     playlist_dom.children[index].children[0].children[1].style.display = "inline-block";
@@ -259,7 +259,7 @@ function buildReader() {
         document.getElementById("media_video").style.display = "inherit";
     }
 
-    buildReaderPlaylist()
+    buildReaderPlaylist();
 }
 
 function buildReaderPlaylist() {
@@ -311,7 +311,7 @@ function controlsPlay() {
     var video = document.getElementById("media_video");
 
     var playButton = document.createElement("webicon");
-    playButton.onclick = function() { controlsPlay() };
+    playButton.onclick = function() { controlsPlay(); };
     playButton.id = "play_button";
 
     if(play) {
