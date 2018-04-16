@@ -353,12 +353,32 @@ video {
     width: 3rem;
 }
 
-/* FOOTER */
+/* Progress Barr */
 
-footer {
-    background-color: #292929;
+#progress-bar {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 75%;
+    height: .33rem;
+
+    border-radius: 33px;
+    background-color: #4b4b4b;
+    border: none;
+
+    cursor: pointer;
 }
 
-footer p {
-    margin: 0;
+#progress-bar::-moz-progress-bar {
+    -moz-appearance: none;
+
+    background-color: #55d4c2;
+    border-radius: 33px;
+}
+
+#progress-bar::-webkit-progress-value {
+    -webkit-appearance: none;
+
+    background-color: #55d4c2;
+    border-radius: 33px;
 }

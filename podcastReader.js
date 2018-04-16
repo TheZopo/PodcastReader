@@ -254,6 +254,7 @@ function updatePodcastControls() {
 
 function controlsPlay() {
     var video = document.getElementById("media_video");
+    video.addEventListener("timeupdate", function() { updateTimer() });
 
     var playButton = document.createElement("webicon");
     playButton.onclick = function() { controlsPlay() };
@@ -276,6 +277,19 @@ function controlsPlay() {
 
         play = true;
     }
+}
+
+function updateTimer() {
+    var video = document.getElementById("media_video");
+    document.getElementById("progress-bar").value = video.currentTime / video.duration;
+}
+
+function clickProgressBar(event) {
+    var progress = document.getElementById("progress-bar");
+    var video = document.getElementById("media_video");
+
+    progress.value = (event.clientX - progress.offsetLeft) / progress.offsetWidth;
+    video.currentTime = progress.value * video.duration;
 }
 
 //  UTILS
