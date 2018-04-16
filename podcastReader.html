@@ -22,7 +22,7 @@
                 <input type="text" placeholder="rss stream..." id="streamURL"/>
                 <button onclick="loadStream()">Add stream</button>
             </div>
-            <div class="streams"></div>
+            <div id="stream_list"></div>
         </div>
     </div>
 
@@ -31,15 +31,33 @@
         <div class="container">
             <img id="streamCover" src="" />
             <h1 id="streamTitle"></h1>
-            <div class="podcasts"></div>
+            <div id="podcast_list"></div>
         </div>
     </div>
 
-    <div class="playlist">
+    <div class="screen" id="player">
         <div class="container">
+            <img id="media_img" src="" />
+            <video id="media_video"></video>
+
+            <div class="controls">
+                <div class="buttons" id="buttons_wrapper">
+                    <webicon icon="metrize:prev-step"></webicon>
+                    <webicon id="play_button" icon="metrize:play" onclick="controlsPlay()"></webicon>
+                    <webicon icon="metrize:next-step"></webicon>
+                </div>
+            </div>
+
+            <div id="player_list"></div>
+        </div>
+    </div>
+
+    <div class="playlist" id="playlist">
+        <div class="container">
+            <button onclick="appendPlaylist()">Play</button>
             <input type="text" id="playlistTitle" value="My super playlist">
             <i id="addItemHint">Click on a item of your rss stream to add it in your playlist</i>
-            <div class="items"></div>
+            <div id="playlist_items"></div>
         </div>
     </div>
 </body>

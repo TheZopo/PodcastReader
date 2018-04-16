@@ -1,5 +1,6 @@
 var streams = [];
 var playlist = [];
+var play = false;
 
 function loadStream() {
     if(streamAlreadyExists()) {
@@ -8,7 +9,7 @@ function loadStream() {
         return;
     }
 
-    var url = "https://crossorigin.me/" + document.getElementById("streamURL").value;
+    var url = "https://cors-anywhere.herokuapp.com/" + document.getElementById("streamURL").value;
     var request = new XMLHttpRequest();
     request.open("GET", url);
     request.setRequestHeader("Origin", "http://localhost/");
@@ -37,7 +38,7 @@ function loadStream() {
                     description: htmlDecode(item.querySelector("description").textContent),
                     date: new Date(item.querySelector("pubDate").textContent).toLocaleDateString("fr-FR"),
                     url: item.querySelector("enclosure").getAttribute("url"),
-                    type: item.querySelector("enclosure").getAttribute("type"),
+                    type: item.querySelector("enclosure").getAttribute("type")
                 };
 
                 podcasts.push(podcast);
@@ -59,7 +60,7 @@ function addStream(stream) {
     document.getElementById("streamURL").value = "";
 
     var dom_stream = buildDOMStream(stream);
-    document.getElementsByClassName("streams")[0].appendChild(dom_stream);
+    document.getElementById("stream_list").appendChild(dom_stream);
     fadeIn(dom_stream);
 }
 
@@ -90,7 +91,7 @@ function buildDOMStream(stream) {
 }
 
 function selectStream(stream) {
-    var podcasts = document.getElementsByClassName("podcasts")[0];
+    var podcasts = document.getElementById("podcast_list");
     while(podcasts.firstChild) podcasts.removeChild(podcasts.firstChild);
 
     stream.podcasts.forEach(function(podcast) {
@@ -122,11 +123,11 @@ function buildDOMPodcast(podcast) {
     return dom_podcast;
 }
 
-function buildVideoTag(stream) {
-    var video = document.getElementsByTagName("video")[0];
+function buildReader() {
+    var video = document.getElementById("media_video");
     while(video.firstChild) video.removeChild(video.firstChild);
 
-    stream.podcasts.forEach(function(podcast) {
+    playlist.forEach(function(podcast) {
         var source = document.createElement("source");
         source.setAttribute("src", podcast.url);
         source.setAttribute("type", podcast.type);
@@ -134,11 +135,14 @@ function buildVideoTag(stream) {
         video.appendChild(source);
     });
 
-    return video;
+    if(playlist[0].type.includes("audio")) {
+        document.getElementById("media_img").setAttribute("src", getPodcastStream(playlist[0]).image);
+        document.getElementById("media_video").style.display = "none";
+    }
 }
 
 function onClickOnPodcastList(podcast, dom_podcast) {
-    var items = document.getElementsByClassName("items")[0];
+    var items = document.getElementById("playlist_items");
 
     if(!podcastAlreadyInPlaylist(podcast)) {
         dom_podcast.classList.add("selected");
@@ -146,7 +150,7 @@ function onClickOnPodcastList(podcast, dom_podcast) {
         var playlistItem = document.createElement("div");
         playlistItem.classList.add("item");
         playlistItem.setAttribute("podcastid", podcast.id);
-        playlistItem.textContent = streams[podcast.id.split("-")[0]].title + " - " + podcast.title + " (" + podcast.date + ")";
+        playlistItem.textContent = getPodcastStream(podcast).title + " - " + podcast.title + " (" + podcast.date + ")";
 
         var controls = document.createElement("div");
         controls.classList.add("itemControls");
@@ -174,8 +178,7 @@ function onClickOnPodcastList(podcast, dom_podcast) {
         if(playlist.length > 0) items.lastChild.children[0].children[1].style.display = "inline-block";
         items.appendChild(playlistItem);
 
-        //Needed to update icons, this is the only use of JQuery in the code
-        $(document).webicons();
+        reloadIcons();
 
         playlist.push(podcast);
     } else {
@@ -186,7 +189,7 @@ function onClickOnPodcastList(podcast, dom_podcast) {
 }
 
 function removePodcastFromList(podcast) {
-    var podcasts = document.getElementsByClassName("podcasts")[0];
+    var podcasts = document.getElementById("podcast_list");
     for(var i = 0; i < podcasts.children.length; i++) {
         if(podcasts.children[i].getAttribute("podcastid") === podcast.id) {
             podcasts.children[i].classList.remove("selected");
@@ -194,7 +197,7 @@ function removePodcastFromList(podcast) {
         }
     }
 
-    var playlistItems = document.getElementsByClassName("items")[0];
+    var playlistItems = document.getElementById("playlist_items");
     for(i = 0; i < playlistItems.children.length; i++) {
         if(playlistItems.children[i].getAttribute("podcastid") === podcast.id) {
             playlistItems.removeChild(playlistItems.children[i]);
@@ -213,7 +216,7 @@ function podcastUp(podcast) {
     playlist[index] = playlist[index - 1];
     playlist[index - 1] = podcast;
 
-    var playlist_dom = document.querySelector(".playlist .items");
+    var playlist_dom = document.getElementById("playlist_items");
     playlist_dom.insertBefore(playlist_dom.children[index], playlist_dom.children[index - 1]);
     playlist_dom.children[index - 1].children[0].children[0].style.display = "inline-block";
     playlist_dom.children[index - 1].children[0].children[1].style.display = "inline-block";
@@ -242,9 +245,37 @@ function podcastDown(podcast) {
 function updatePodcastControls() {
     document.getElementById("addItemHint").style.display = playlist.length === 0 ? "inline" : "none";
 
-    var playlistItems = document.getElementsByClassName("items")[0];
+    var playlistItems = document.getElementById("playlist_items");
     playlistItems.firstChild.children[0].children[0].style.display = "none";
     playlistItems.lastChild.children[0].children[1].style.display = "none";
+}
+
+// CONTROLS
+
+function controlsPlay() {
+    var video = document.getElementById("media_video");
+
+    var playButton = document.createElement("webicon");
+    playButton.onclick = function() { controlsPlay() };
+    playButton.id = "play_button";
+
+    if(play) {
+        video.pause();
+
+        playButton.setAttribute("icon", "metrize:play");
+        document.getElementById("buttons_wrapper").replaceChild(playButton, document.getElementById("play_button"));
+        reloadIcons();
+
+        play = false;
+    } else {
+        video.play();
+
+        playButton.setAttribute("icon", "metrize:pause");
+        document.getElementById("buttons_wrapper").replaceChild(playButton, document.getElementById("play_button"));
+        reloadIcons();
+
+        play = true;
+    }
 }
 
 //  UTILS
@@ -268,6 +299,10 @@ function htmlDecode(input){
     var element = document.createElement('div');
     element.innerHTML = input;
     return element.childNodes.length === 0 ? "" : element.childNodes[0].nodeValue;
+}
+
+function getPodcastStream(podcast) {
+    return streams[parseInt(podcast.id.split("-")[0])];
 }
 
 //  ANIMATIONS
@@ -327,6 +362,45 @@ function podcastsToStreams() {
         document.querySelector(".screen#streams").style.left = "0";
     }, 250);
 
-    var podcasts = document.getElementsByClassName("podcasts")[0];
+    var podcasts = document.getElementById("podcast_list");
     while(podcasts.firstChild) podcasts.removeChild(podcasts.firstChild);
+}
+
+function appendPlaylist() {
+    var element = document.getElementById("playlist");
+
+
+    var height = 0;
+    var incr = 1.5;
+    if(element.style.height !== "100vh") {
+        element.style.maxHeight = "100vh";
+        element.style.overflowY = "inherit";
+    } else {
+        height = 100;
+        incr = -1.5;
+    }
+
+    var timer = setInterval(function () {
+        if (height >= 98){
+            element.style.display = "none";
+
+            document.getElementById("player").style.display = "block";
+            document.getElementById("streams").style.display = "none";
+            document.getElementById("podcasts").style.display = "none";
+
+            document.getElementsByTagName("body")[0].style.backgroundColor = "#373737";
+
+            buildReader();
+
+            clearInterval(timer);
+        }
+
+        height += incr;
+        element.style.height = height +"vh";
+    }, 1);
+}
+
+function reloadIcons() {
+    //Needed to update icons, this is the only use of JQuery in the code
+    $(document).webicons();
 }
